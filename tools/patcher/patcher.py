@@ -12,7 +12,8 @@ PATCHES = {
     'all_leds_on': {
         'signature': 'a0 89 5e fc 10 00 20 6d 5e f8 10 00 5e fc 10 00 42 b0 24 00 a2 40 e0 ff a2 41',
         'patch': '00 0c',
-        'description': 'Patches the I2C write routine to force all LEDs to be on. This is the "original" winning patch from DEFCON 26.'
+        'description': 'Patches the I2C write routine to force all LEDs to be on. This is the "original" winning '\
+                       'patch from DEFCON 26.'
     }
 }
 
@@ -22,7 +23,25 @@ PARAMETERIZED_PATCHES = {
         'signature': '42 00 3c 2b 5e 18 00 00 5e 14 00 00 be 0f c3 4b 09 4c bf 45 b0 4f c1 cb dd 0f 44 0c',
         'parameterized_patch': 'XX ed 00 0C',
         'params': 1,
-        'description': 'Patches the routine determining badge type to make your badge think it is of a different type. Valid values are 0-7.'
+        'description': 'Patches the routine determining badge type to make your badge think it is of a different '\
+                       'type. Valid values are 0-7.'
+    }
+}
+
+FLASH_PATCHES = {
+    'pairing_byte': {
+        'address': 0x1d03f800,
+        'params': 1,
+        'description': 'Overwrite the bitfield containing the state of badge pairings. 0 means all badges have been '\
+                       'paired with, 255 means there have been no pairings.'
+    },
+    'karma_byte': {
+        'address': 0x1d03f801,
+        'params': 1,
+        'description': 'Overwrite the bitfield containing the karma of paired badges. 0 means that all badge types '\
+                       'have good karma (green N), 255 means all badge types have neutral or bad karma (red N). Note '\
+                       'that this is distinct from the pairing state and you need both pairing and karma at 0 '\
+                       'to officially solve the puzzle.'
     }
 }
 
@@ -42,7 +61,7 @@ def backup_file(path):
 
 
 def convert_hex_str_to_list(h):
-    return [int(x, 16) for x in h.split(' ')]
+    return [validate_byte(int(x, 16)) for x in h.split(' ')]
 
 
 def search_for_patch_area(ih, byte_seq):
@@ -69,53 +88,55 @@ def search_for_patch_area(ih, byte_seq):
         return result[0]
 
 
-def perform_patch(ih, addr, byte_seq):
+def perform_patch(ih, patch_name, addr, byte_seq):
+    print('Applying patch {} at address {} ({} byte(s))'.format(patch_name, '0x%0.8X' % addr, len(byte_seq)))
     for i, b in enumerate(byte_seq):
-        ih[addr + i] = b
+        ih[addr + i] = validate_byte(b)
+
+
+def validate_byte(b):
+    if b < 0 or b > 255:
+        raise Exception('Received a value that was not a valid byte: {}'.format(b))
+    return b
 
 
 def parameterize_patch(patch, param):
-    parsed_param = int(param)
-    if parsed_param < 0 or parsed_param > 255:
-        raise Exception('Invalid parameter - valid ranges are 0 to 255 inclusive')
-    return patch.replace('XX', '%0.2X' % parsed_param)
+    return patch.replace('XX', '%0.2X' % validate_byte(param))
 
 
-def patch_file(args):
-    ih = IntelHex()
-    ih.loadhex(args.input_file)
-
+def do_patches(ih, args):
     for patch_name in PATCHES:
         val = getattr(args, patch_name)
         if val is False:
             continue
+
         patch_data = PATCHES[patch_name]
         patch_bytes = convert_hex_str_to_list(patch_data['patch'])
-
         start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch_data['signature']))
-        print('Applying patch {} at address {} ({} bytes)'.format(patch_name, '0x%0.8X' % start_addr, len(patch_bytes)))
         perform_patch(ih, start_addr, patch_bytes)
 
+
+def do_parameterized_patches(ih, args):
     for patch_name in PARAMETERIZED_PATCHES:
         val = getattr(args, patch_name)
-        if val is None or len(val) == 0:
+        if val is None:
             continue
 
         patch_data = PARAMETERIZED_PATCHES[patch_name]
         patch_bytes = convert_hex_str_to_list(parameterize_patch(patch_data['parameterized_patch'], val[0]))
-
         start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch_data['signature']))
-        print('Applying patch {} at address {} ({} bytes)'.format(patch_name, '0x%0.8X' % start_addr, len(patch_bytes)))
         perform_patch(ih, start_addr, patch_bytes)
 
-    backup_file(args.input_file)
-    sio = StringIO()
-    ih.write_hex_file(sio)
-    output = sio.getvalue()
-    output = output.encode('utf-8').replace(b'\r\n', b'\n')
-    with open(args.input_file, 'wb') as f:
-        f.write(output)
 
+def do_flash_patches(ih, args):
+    for patch_name in FLASH_PATCHES:
+        val = getattr(args, patch_name)
+        if val is None:
+            continue
+
+        patch_data = FLASH_PATCHES[patch_name]
+        start_addr = patch_data['address']
+        perform_patch(ih, patch_name, start_addr, val)
 
 
 if __name__ == '__main__':
@@ -128,8 +149,25 @@ if __name__ == '__main__':
         
     for patch_name in PARAMETERIZED_PATCHES:
         patch_data = PARAMETERIZED_PATCHES[patch_name]
-        parser.add_argument('--%s' % patch_name, help=patch_data['description'], nargs=patch_data['params'])
+        parser.add_argument('--%s' % patch_name, help=patch_data['description'], type=int, nargs=patch_data['params'])
+        
+    for patch_name in FLASH_PATCHES:
+        patch_data = FLASH_PATCHES[patch_name]
+        parser.add_argument('--%s' % patch_name, help=patch_data['description'], type=int, nargs=patch_data['params'])
 
     args = parser.parse_args()
+
+    ih = IntelHex()
+    ih.loadhex(args.input_file)
     
-    patch_file(args)
+    do_patches(ih, args)
+    do_parameterized_patches(ih, args)
+    do_flash_patches(ih, args)
+
+    backup_file(args.input_file)
+    sio = StringIO()
+    ih.write_hex_file(sio)
+    output = sio.getvalue()
+    output = output.encode('utf-8').replace(b'\r\n', b'\n')
+    with open(args.input_file, 'wb') as f:
+        f.write(output)

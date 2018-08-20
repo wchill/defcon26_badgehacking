@@ -4,6 +4,8 @@ Patches a clean firmware dump from a DEFCON 26 badge with one or more of the fol
 
 	* Turn all LEDs on (the original "winning" patch)
 	* Set your badge type to a different one (for example, change a human badge to a press badge)
+	* Set which badges you have paired with
+	* Set which badges that you've paired with have good karma (green N)
 	* More to come
 
 # Usage
