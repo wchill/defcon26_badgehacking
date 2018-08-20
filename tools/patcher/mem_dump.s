@@ -23,7 +23,7 @@ main:
 	move $s1, $zero
 
 	# zero out the string
-	sw $s1, 0($s0)
+	sw $zero, 0($s0)
 
 main_loop:
 	addi $t0, $fp, -128
@@ -69,7 +69,9 @@ format_word:
 
 	addi $a0, $fp, -256
 	addi $a1, $fp, -128
-	lw $a2, 0($s1)
+	lui $t0, 0x8000
+	add $t0, $t0, $s1
+	lw $a2, 0($t0)
 	li $t0, 0x9D022D7C		# maybe_sprintf
 	jalr $t0
 	nop
