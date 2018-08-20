@@ -113,7 +113,7 @@ def do_patches(ih, args):
         patch_data = PATCHES[patch_name]
         patch_bytes = convert_hex_str_to_list(patch_data['patch'])
         start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch_data['signature']))
-        perform_patch(ih, start_addr, patch_bytes)
+        perform_patch(ih, patch_name, start_addr, patch_bytes)
 
 
 def do_parameterized_patches(ih, args):
@@ -125,7 +125,7 @@ def do_parameterized_patches(ih, args):
         patch_data = PARAMETERIZED_PATCHES[patch_name]
         patch_bytes = convert_hex_str_to_list(parameterize_patch(patch_data['parameterized_patch'], val[0]))
         start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch_data['signature']))
-        perform_patch(ih, start_addr, patch_bytes)
+        perform_patch(ih, patch_name, start_addr, patch_bytes)
 
 
 def do_flash_patches(ih, args):
@@ -137,6 +137,19 @@ def do_flash_patches(ih, args):
         patch_data = FLASH_PATCHES[patch_name]
         start_addr = patch_data['address']
         perform_patch(ih, patch_name, start_addr, val)
+
+        
+def do_arbitrary_patches(ih, args):
+    patches = args.patch
+    if patches is None:
+        return
+
+    for patch in patches:
+        if len(patch) < 2:
+            continue
+        addr = patch[0]
+        patch_bytes = patch[1:]
+        perform_patch(ih, 'arbitrary_patch', addr, patch_bytes)
 
 
 if __name__ == '__main__':
@@ -155,6 +168,8 @@ if __name__ == '__main__':
         patch_data = FLASH_PATCHES[patch_name]
         parser.add_argument('--%s' % patch_name, help=patch_data['description'], type=int, nargs=patch_data['params'])
 
+    parser.add_argument('--patch', help='Performs an arbitrary memory patch. Specify address, then bytes. Can be specified multiple times.', action='append', nargs='+')
+
     args = parser.parse_args()
 
     ih = IntelHex()
@@ -163,6 +178,7 @@ if __name__ == '__main__':
     do_patches(ih, args)
     do_parameterized_patches(ih, args)
     do_flash_patches(ih, args)
+    do_arbitrary_patches(ih, args)
 
     backup_file(args.input_file)
     sio = StringIO()
