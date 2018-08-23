@@ -30,8 +30,35 @@ PATCHES = {
                 'patch': 'a8 41 03 9d 88 45 00 0c'
             }
         ],
-        'description': 'Add a memory dump routine to the service menu, replacing the "get BB buffer" option.'
-    }
+        'description': 'Add a memory dump routine to the service menu, replacing the "get BB buffer" option. '\
+                       'Currently doesn\'t work.'
+    },
+    # 1d01a0f4
+    'fix_p1': {
+        'patches': [
+            {
+                'signature': '42 70 05 00 42 b0 01 00 2d 2d 82 0c 5e fc',
+                'patch': '42 70 01 00'
+            },
+        ],
+        'description': 'Fixes the bug in hardware puzzle 1 that prevents E from turning green, even when C11 is '\
+                       'shorted.'
+    },
+    'solve_p1': {
+        'patches': [
+            {
+                'signature': '1e 18 00 00 a2 41 80 bf 42 fc d0 2d 42 00 ec 00 2d 2d 62 0c 5e 14 00 00',
+                'patch': 'a3 41 80 bf 04 ed 43 18 e8 2b 43 fc d0 2d 42 00 ec 00 2d 2d 00 0c 00 0c 00 0c'
+            },
+            {
+                'signature': 'd3 44 42 00 3c 2b 5e 18 00 00 5e 14 00 00 be 0f c3 4b 09 4c bf 45 00 0c',
+                'patch': '00 0c'
+            }
+        ],
+        'description': 'Pulls RA2 high, forcing the LED next to C11 to always be on without actually having to '\
+                       'short C11. On a human badge, this reconfigures the ARC Networks console and solves hardware '\
+                       'puzzle 1. Note that on v0 and v1 firmwares, the fix_p1 patch is also required.'
+    },
 }
 
 PARAMETERIZED_PATCHES = {
@@ -43,9 +70,6 @@ PARAMETERIZED_PATCHES = {
         'description': 'Patches the routine determining badge type to make your badge think it is of a different '\
                        'type. Valid values are 0-7.'
     }
-}
-
-STATIC_PATCHES = {
 }
 
 FLASH_PATCHES = {
