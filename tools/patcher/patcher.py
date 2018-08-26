@@ -48,17 +48,46 @@ PATCHES = {
         'patches': [
             {
                 'signature': '1e 18 00 00 a2 41 80 bf 42 fc d0 2d 42 00 ec 00 2d 2d 62 0c 5e 14 00 00',
-                'patch': 'a3 41 80 bf 04 ed 43 18 e8 2b 43 fc d0 2d 42 00 ec 00 2d 2d 00 0c 00 0c 00 0c'
+                'patch': 'a3 41 80 bf 14 ed 43 18 e8 2b 43 fc d0 2d 42 00 ec 00 2d 2d 00 0c 00 0c 00 0c'
             },
             {
                 'signature': 'd3 44 42 00 3c 2b 5e 18 00 00 5e 14 00 00 be 0f c3 4b 09 4c bf 45 00 0c',
                 'patch': '00 0c'
             }
         ],
-        'description': 'Pulls RA2 high, forcing the LED next to C11 to always be on without actually having to '\
-                       'short C11. On a human badge, this reconfigures the ARC Networks console and solves hardware '\
-                       'puzzle 1. Note that on v0 and v1 firmwares, the fix_p1 patch is also required.'
+        'description': 'Pulls RA2 and RA4 high, forcing the LED next to C11 to always be on without actually '\
+                       'having to short C11. On a human badge, this reconfigures the ARC Networks console and '\
+                       'solves hardware puzzle 1. Note that on v0/v1 firmwares, the fix_p1 patch is also required.'
     },
+    'solve_p4': {
+        'patches': [
+            {
+                'signature': 'a2 40 03 00 01 ed 02 cc 00 0c 40 0c be 0f c1 4b 05 4c bf 45 c1 4f 3d 21',
+                'patch': '00 0c 00 0c'
+            }
+        ],
+        'description': 'Pulls RD0 high, forcing the hall effect sensor to always appear to be activated. '\
+                       'Note that the LED will not activate.'
+    },
+    'always_enable_debug_menu': {
+        'patches': [
+            {
+                'address': 0x1d03fffb,
+                'patch': 0xFE
+            }
+        ],
+        'description': 'Sets the bit that allows using the USB debug menu at any bitrate. USB OTG is still required.'
+    },
+    'fix_pairing_bug': {
+        'patches': [
+            {
+                'address': 0x1d01b698,
+                'patch': '38'
+            }
+        ],
+        'description': 'Patches the pairing bug in the v0 firmware that prevented badges from updating karma data '\
+                       'correctly.'
+    }
 }
 
 PARAMETERIZED_PATCHES = {
@@ -69,18 +98,17 @@ PARAMETERIZED_PATCHES = {
         'params': 1,
         'description': 'Patches the routine determining badge type to make your badge think it is of a different '\
                        'type. Valid values are 0-7.'
-    }
-}
-
-FLASH_PATCHES = {
+    },
     'pairing_byte': {
         'address': 0x1d03f800,
+        'parameterized_patch': 'XX',
         'params': 1,
         'description': 'Overwrite the bitfield containing the state of badge pairings. 0 means all badges have been '\
                        'paired with, 255 means there have been no pairings.'
     },
     'karma_byte': {
         'address': 0x1d03f801,
+        'parameterized_patch': 'XX',
         'params': 1,
         'description': 'Overwrite the bitfield containing the karma of paired badges. 0 means that all badge types '\
                        'have good karma (green N), 255 means all badge types have neutral or bad karma (red N). Note '\
@@ -175,21 +203,15 @@ def do_parameterized_patches(ih, args):
         if val is None:
             continue
 
-        patch_data = PARAMETERIZED_PATCHES[patch_name]
-        patch_bytes = convert_hex_str_to_list(parameterize_patch(patch_data['parameterized_patch'], val[0]))
-        start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch_data['signature']))
+        patch = PARAMETERIZED_PATCHES[patch_name]
+        patch_bytes = convert_hex_str_to_list(parameterize_patch(patch['parameterized_patch'], val[0]))
+        start_addr = None
+
+        if 'signature' in patch:
+            start_addr = search_for_patch_area(ih, convert_hex_str_to_list(patch['signature']))
+        else:
+            start_addr = patch['address']
         perform_patch(ih, patch_name, start_addr, patch_bytes)
-
-
-def do_flash_patches(ih, args):
-    for patch_name in FLASH_PATCHES:
-        val = getattr(args, patch_name)
-        if val is None:
-            continue
-
-        patch_data = FLASH_PATCHES[patch_name]
-        start_addr = patch_data['address']
-        perform_patch(ih, patch_name, start_addr, val)
 
         
 def do_arbitrary_patches(ih, args):
@@ -208,6 +230,7 @@ def do_arbitrary_patches(ih, args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Patches the DEFCON26 badge firmware.')
     parser.add_argument('input_file', metavar='file', type=str, help='Path to a firmware hex to patch')
+    parser.add_argument('output_file', metavar='file', type=str, help='Name of the output file')
 
     for patch_name in PATCHES:
         patch_data = PATCHES[patch_name]
@@ -215,10 +238,6 @@ if __name__ == '__main__':
         
     for patch_name in PARAMETERIZED_PATCHES:
         patch_data = PARAMETERIZED_PATCHES[patch_name]
-        parser.add_argument('--%s' % patch_name, help=patch_data['description'], type=int, nargs=patch_data['params'])
-        
-    for patch_name in FLASH_PATCHES:
-        patch_data = FLASH_PATCHES[patch_name]
         parser.add_argument('--%s' % patch_name, help=patch_data['description'], type=int, nargs=patch_data['params'])
 
     parser.add_argument('--patch', help='Performs an arbitrary memory patch. Specify address, then bytes. Can be specified multiple times.', action='append', nargs='+')
@@ -230,13 +249,12 @@ if __name__ == '__main__':
     
     do_patches(ih, args)
     do_parameterized_patches(ih, args)
-    do_flash_patches(ih, args)
     do_arbitrary_patches(ih, args)
 
-    backup_file(args.input_file)
+    # backup_file(args.input_file)
     sio = StringIO()
     ih.write_hex_file(sio)
     output = sio.getvalue()
     output = output.encode('utf-8').replace(b'\r\n', b'\n')
-    with open(args.input_file, 'wb') as f:
+    with open(args.output_file, 'wb') as f:
         f.write(output)
