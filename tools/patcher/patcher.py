@@ -19,6 +19,7 @@ PATCHES = {
         'description': 'Patches the I2C write routine to force all LEDs to be on. This is the "original" winning '\
                        'patch from DEFCON 26.'
     },
+    """
     'dump_memory': {
         'patches': [
             {
@@ -33,6 +34,7 @@ PATCHES = {
         'description': 'Add a memory dump routine to the service menu, replacing the "get BB buffer" option. '\
                        'Currently doesn\'t work.'
     },
+    """
     # 1d01a0f4
     'fix_p1': {
         'patches': [

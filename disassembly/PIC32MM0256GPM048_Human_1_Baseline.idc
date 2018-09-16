@@ -43,10 +43,10 @@ static GenInfo(void) {
 	set_inf_attr(INF_STRLIT_BREAK, 0xA);
 	set_flag(INF_CMTFLAG, SW_ALLCMT, 0);
 	set_flag(INF_OUTFLAGS, OFLG_SHOW_VOID, 0);
-	set_inf_attr(INF_XREFNUM, 0);
+	set_inf_attr(INF_XREFNUM, 2);
 	set_flag(INF_OUTFLAGS, OFLG_SHOW_AUTO, 1);
-	set_inf_attr(INF_INDENT, 0);
-	set_inf_attr(INF_COMMENT, 24);
+	set_inf_attr(INF_INDENT, 16);
+	set_inf_attr(INF_COMMENT, 40);
 	set_inf_attr(INF_MAXREF, 0x10);
 }
 
@@ -3696,6 +3696,7 @@ static Bytes_0(void) {
 	op_stkvar	(x,	1);
 	create_insn	(x=0X9D009A24);
 	op_stkvar	(x,	1);
+	set_cmt	(0X9D009A32,	"Note that RC2 is also connected to the robot head LED.",	1);
 	create_insn	(x=0X9D009A3E);
 	op_hex		(x,	1);
 	create_insn	(x=0X9D009A44);
@@ -4877,13 +4878,6 @@ static Bytes_0(void) {
 	op_plain_offset	(x,	129,	0X100000250);
 	create_insn	(x=0X9D00A760);
 	op_dec		(x,	1);
-	create_insn	(x=0X9D00A762);
-	op_hex		(x,	1);
-	create_insn	(x=0X9D00A764);
-	op_hex		(x,	1);
-	create_insn	(x=0X9D00A768);
-	op_plain_offset	(x,	1,	0);
-	op_plain_offset	(x,	129,	0);
 }
 
 //------------------------------------------------------------------------
@@ -4893,6 +4887,13 @@ static Bytes_1(void) {
         auto x;
 #define id x
 
+	create_insn	(x=0X9D00A762);
+	op_hex		(x,	1);
+	create_insn	(x=0X9D00A764);
+	op_hex		(x,	1);
+	create_insn	(x=0X9D00A768);
+	op_plain_offset	(x,	1,	0);
+	op_plain_offset	(x,	129,	0);
 	create_insn	(x=0X9D00A770);
 	op_plain_offset	(x,	1,	0X100000250);
 	op_plain_offset	(x,	129,	0X100000250);
@@ -10286,6 +10287,7 @@ static Bytes_1(void) {
 	op_dec		(x,	1);
 	create_insn	(x=0X9D019D60);
 	op_stkvar	(x,	1);
+	set_cmt	(0X9D019D66,	"stores to either inverted_v0 or inverted_v1",	1);
 	set_cmt	(0X9D019D6E,	"jumptable 9D0199E0 case 4",	1);
 	create_insn	(0X9D019D6E);
 	create_insn	(x=0X9D019D76);
@@ -10706,6 +10708,15 @@ static Bytes_1(void) {
 	op_dec		(x,	1);
 	create_insn	(x=0X9D01A266);
 	op_dec		(x,	1);
+}
+
+//------------------------------------------------------------------------
+// Information about bytes
+
+static Bytes_2(void) {
+        auto x;
+#define id x
+
 	create_insn	(x=0X9D01A26C);
 	op_dec		(x,	1);
 	create_insn	(x=0X9D01A26E);
@@ -10719,15 +10730,6 @@ static Bytes_1(void) {
 	op_plain_offset	(x,	1,	0);
 	op_plain_offset	(x,	129,	0);
 	set_cmt	(0X9D01A296,	"switch 8 cases ",	0);
-}
-
-//------------------------------------------------------------------------
-// Information about bytes
-
-static Bytes_2(void) {
-        auto x;
-#define id x
-
 	set_cmt	(0X9D01A298,	"jump table for switch statement",	0);
 	create_dword	(x=0X9D01A298);
 	make_array	(x,	0X8);
@@ -16807,6 +16809,15 @@ static Bytes_2(void) {
 	create_insn	(x=0X9D01FCEC);
 	op_plain_offset	(x,	1,	0X80000CF4);
 	op_plain_offset	(x,	129,	0X80000CF4);
+}
+
+//------------------------------------------------------------------------
+// Information about bytes
+
+static Bytes_3(void) {
+        auto x;
+#define id x
+
 	create_insn	(x=0X9D01FCEE);
 	op_plain_offset	(x,	1,	0XFFFFFFFF);
 	op_plain_offset	(x,	129,	0XFFFFFFFF);
@@ -16819,15 +16830,6 @@ static Bytes_2(void) {
 	create_insn	(x=0X9D01FCFE);
 	op_plain_offset	(x,	1,	0X80000CF4);
 	op_plain_offset	(x,	129,	0X80000CF4);
-}
-
-//------------------------------------------------------------------------
-// Information about bytes
-
-static Bytes_3(void) {
-        auto x;
-#define id x
-
 	create_insn	(x=0X9D01FD0E);
 	op_hex		(x,	1);
 	create_insn	(x=0X9D01FD12);
@@ -22680,6 +22682,15 @@ static Bytes_3(void) {
 	create_dword	(0XBF8030F0);
 	create_dword	(0XBF8030F4);
 	create_dword	(0XBF8030F8);
+}
+
+//------------------------------------------------------------------------
+// Information about bytes
+
+static Bytes_4(void) {
+        auto x;
+#define id x
+
 	create_dword	(0XBF8030FC);
 	create_dword	(0XBF803100);
 	create_dword	(0XBF803104);
@@ -22692,15 +22703,6 @@ static Bytes_3(void) {
 	create_dword	(0XBF803120);
 	create_dword	(0XBF803124);
 	create_dword	(0XBF803128);
-}
-
-//------------------------------------------------------------------------
-// Information about bytes
-
-static Bytes_4(void) {
-        auto x;
-#define id x
-
 	create_dword	(0XBF80312C);
 	create_dword	(0XBF803130);
 	create_dword	(0XBF803134);
@@ -28785,6 +28787,15 @@ static Bytes_4(void) {
 	create_dword	(0XBF808FA0);
 	create_dword	(0XBF808FA4);
 	create_dword	(0XBF808FA8);
+}
+
+//------------------------------------------------------------------------
+// Information about bytes
+
+static Bytes_5(void) {
+        auto x;
+#define id x
+
 	create_dword	(0XBF808FAC);
 	create_dword	(0XBF808FB0);
 	create_dword	(0XBF808FB4);
@@ -28797,15 +28808,6 @@ static Bytes_4(void) {
 	create_dword	(0XBF808FD0);
 	create_dword	(0XBF808FD4);
 	create_dword	(0XBF808FD8);
-}
-
-//------------------------------------------------------------------------
-// Information about bytes
-
-static Bytes_5(void) {
-        auto x;
-#define id x
-
 	create_dword	(0XBF808FDC);
 	create_dword	(0XBF808FE0);
 	create_dword	(0XBF808FE4);
@@ -34926,6 +34928,15 @@ static Bytes_5(void) {
 	create_dword	(0XBF80EF70);
 	create_dword	(0XBF80EF74);
 	create_dword	(0XBF80EF78);
+}
+
+//------------------------------------------------------------------------
+// Information about bytes
+
+static Bytes_6(void) {
+        auto x;
+#define id x
+
 	create_dword	(0XBF80EF7C);
 	create_dword	(0XBF80EF80);
 	create_dword	(0XBF80EF84);
@@ -34938,15 +34949,6 @@ static Bytes_5(void) {
 	create_dword	(0XBF80EFA0);
 	create_dword	(0XBF80EFA4);
 	create_dword	(0XBF80EFA8);
-}
-
-//------------------------------------------------------------------------
-// Information about bytes
-
-static Bytes_6(void) {
-        auto x;
-#define id x
-
 	create_dword	(0XBF80EFAC);
 	create_dword	(0XBF80EFB0);
 	create_dword	(0XBF80EFB4);
@@ -36129,6 +36131,7 @@ static Functions_0(void) {
 	define_local_var(0X9D0097CC, 0X9D009840, "[bp+0X100000000]", "a0_backup");
 	add_func    (0X9D009840,0X9D00989E);
 	set_func_flags(0X9D009840,0);
+	set_func_cmt(0X9D009840,	"returns 4 on LFSR error\nreturns 2 if LFSR64 mode (seed 0x80)\nreturns 1 if LFSR8 mode (seed 0x42)", 1);
 	set_frame_size(0X9D009840, 0X10, 0, 0);
 	define_local_var(0X9D009840, 0X9D00989E, "[bp-0X10]", "result");
 	define_local_var(0X9D009840, 0X9D00989E, "[bp-0X4]", "fp_backup");
@@ -36265,6 +36268,7 @@ static Functions_0(void) {
 	set_frame_size(0X9D0198AC, 0X160, 0, 0);
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X160]", "outer_loop_counter");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X15C]", "inner_loop_counter");
+	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X158]", "some_kind_of_zero_check");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X148]", "inverted_v0_from_load_state");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X144]", "inverted_v1_from_load_state");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X24]", "s0_backup");
@@ -36276,10 +36280,12 @@ static Functions_0(void) {
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0XC]", "s7_backup");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X8]", "fp_backup");
 	define_local_var(0X9D0198AC, 0X9D01AE8C, "[bp-0X4]", "ra_backup");
+	set_name(0X9D01AA2C, "write_bit_to_u4_if_var158_is_zero", SN_LOCAL);
 	set_name(0X9D01AA74, "clear_arg_regs_9D01AA74", SN_LOCAL);
 	set_name(0X9D01AB58, "nop_9D01AB58", SN_LOCAL);
+	set_name(0X9D01AB5C, "write_1_to_u4_and_do_stuff", SN_LOCAL);
 	set_name(0X9D01ABB4, "clear_arg_regs_9D01ABB4", SN_LOCAL);
-	set_name(0X9D01ACC6, "nop_9D01ACC6", SN_LOCAL);
+	set_name(0X9D01ACCA, "write_0_to_u4_and_do_stuff", SN_LOCAL);
 	set_name(0X9D01AE34, "nop_9D01AE34", SN_LOCAL);
 	set_name(0X9D01AE4A, "nop_9D01AE4A", SN_LOCAL);
 	set_name(0X9D01AE4C, "increment_outer_loop_counter", SN_LOCAL);

@@ -20,9 +20,9 @@ There are four hardware puzzles on the DEFCON26 badge. They correspond to the fo
 
 1. Short the C11 capacitor on the PCB to stop the LED from blinking. Solves the E on human badges.
 
-2. Feed 0xFEEDB0B0DEADBEEF to U4 LSB first, or desolder U7 and resolder it rotated 180 degrees (both of these will activate the LED next to U4). Currently this puzzle is not working correctly.
+2. Feed 0xFEEDB0B0DEADBEEF to U4 LSB first (this can be done in software).
 
-3. Use U7 as an LFSR somehow (currently unknown what needs to be done). Currently this puzzle is not working correctly.
+3. Desolder U7 and resolder it rotated 180 degrees.
 
 4. Generate a magnetic field next to the hall effect sensor (location will vary based on badge type - on human badges it is behind the subway car on the bottom right). Changes some flavor text, unknown what else it does.
 
@@ -49,6 +49,16 @@ All microcontrollers run off of the same clock signal, which is generated in sof
 Before any encoding/decoding operation is done, the PIC32 will hold RST high to reset U7 (note that this does not reset U4), then drive the clock once before it feeds U4 with input.
 
 To make U4 switch to XOR mode, 0xFEEDB0B0DEADBEEF must be fed to U4 least significant bit first while driving the clock. This will look like you are feeding F77D B57B 0D0D B77F if interpreting as MSB first.
+
+## Puzzle 2 (robot head) notes
+
+Feeding Bobo (the robot head) only works properly in the v2 firmware.
+
+Bobo can be fed by using the buttons in the arcade/control rooms. - corresponds to a 0 while + corresponds to a 1.
+
+Using - or + will drive the shared U4/U7 input clock as well as set the appropriate bit for U4's MISO.
+
+In addition, once 0xFEEDB0B0DEADBEEF has been inputted, the PIC32 will hold U7's reset line high for about 1 second. The user can then perform a decoding operation with -/+, getting the output by observing the LEDs.
 
 ## Other useful PIC32 pins
 
