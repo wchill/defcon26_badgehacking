@@ -15,6 +15,16 @@ Notes and things regarding hacking DEFCON 26's badge
 
 6. Congratulations, you now have a fully green badge!
 
+### Want to do it legitimately on your human badge?
+
+1. Advance all 8 badge types to the point where they have green N, then pair.
+
+2. Short C11 or 2 lower left pins of U5.
+
+3. Flash v2 firmware to badge.
+
+4. Proceed from step 3 above.
+
 ## Writeup
 
 (This is going to be a very bad brain dump written at 3 in the morning about 5 weeks after the fact, please forgive any mistakes/inconsistencies)
