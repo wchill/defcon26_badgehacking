@@ -24,5 +24,3 @@ pip install -r requirements.txt
 Then just run `patcher.py`. You can get usage information by running it with the `-h` switch.
 
 Example usage: `python patcher.py --all_leds_on firmware.hex patched.hex`
-
-The patcher will backup your input file to a timestamped copy and then overwrite the original. There is no way to undo patches, so make sure you keep a copy of the original hex.
