@@ -6,6 +6,23 @@ import shutil
 from io import StringIO
 import argparse
 
+# Below patch doesn't work
+"""
+'dump_memory': {
+    'patches': [
+        {
+            'address': 0x1d030000,
+            'patch': '00 fa bd 27 fc ff bf af f8 ff be af 21 f0 1d 00 00 fa c0 af 80 ff c8 23 34 58 01 3c 25 30 29 34 00 00 09 ad 04 00 00 ad 00 ff c4 23 80 ff c5 23 21 30 00 00 02 9d 01 3c 7c 2d 28 34 09 f8 00 01 00 00 00 00 00 fa c4 27 00 ff c5 27 00 9d 01 3c 8c 01 28 34 09 f8 00 01 00 00 00 00 00 fa c4 27 02 9d 01 3c f4 20 28 34 09 f8 00 01 00 00 00 00 00 80 01 3c 64 03 24 34 00 fa c5 27 21 30 02 00 d0 09 01 3c 18 95 28 34 09 f8 00 01 00 00 00 00 21 e8 1e 00 f8 ff be 8f fc ff bf 8f 00 06 bd 27 08 00 e0 03 00 00 00 00'
+        },
+        {
+            'signature': '5e 30 1c 00 a3 41 02 9d c3 fc 5c f7',
+            'patch': 'a8 41 03 9d 88 45 00 0c'
+        }
+    ],
+    'description': 'Add a memory dump routine to the service menu, replacing the "get BB buffer" option. '\
+                   'Currently doesn\'t work.'
+},
+"""
 
 PATCHES = {
     # 1d020152
@@ -19,22 +36,6 @@ PATCHES = {
         'description': 'Patches the I2C write routine to force all LEDs to be on. This is the "original" winning '\
                        'patch from DEFCON 26.'
     },
-    """
-    'dump_memory': {
-        'patches': [
-            {
-                'address': 0x1d030000,
-                'patch': '00 fa bd 27 fc ff bf af f8 ff be af 21 f0 1d 00 00 fa c0 af 80 ff c8 23 34 58 01 3c 25 30 29 34 00 00 09 ad 04 00 00 ad 00 ff c4 23 80 ff c5 23 21 30 00 00 02 9d 01 3c 7c 2d 28 34 09 f8 00 01 00 00 00 00 00 fa c4 27 00 ff c5 27 00 9d 01 3c 8c 01 28 34 09 f8 00 01 00 00 00 00 00 fa c4 27 02 9d 01 3c f4 20 28 34 09 f8 00 01 00 00 00 00 00 80 01 3c 64 03 24 34 00 fa c5 27 21 30 02 00 d0 09 01 3c 18 95 28 34 09 f8 00 01 00 00 00 00 21 e8 1e 00 f8 ff be 8f fc ff bf 8f 00 06 bd 27 08 00 e0 03 00 00 00 00'
-            },
-            {
-                'signature': '5e 30 1c 00 a3 41 02 9d c3 fc 5c f7',
-                'patch': 'a8 41 03 9d 88 45 00 0c'
-            }
-        ],
-        'description': 'Add a memory dump routine to the service menu, replacing the "get BB buffer" option. '\
-                       'Currently doesn\'t work.'
-    },
-    """
     # 1d01a0f4
     'fix_p1': {
         'patches': [
