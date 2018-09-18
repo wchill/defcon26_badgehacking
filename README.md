@@ -73,7 +73,7 @@ Sadly, the black badge was not to be. However, Tymkrs considered our cheat a win
 
 Everyone went back to their daily lives, mostly satisfied that the badge had been "solved". But I felt like the patch I'd accidentally discovered was just not good enough.
 
-Work continued on the Slack. braz and Trevor Roach decided to look into the behavior of U7 since it was pretty well known by now that it acted as a LFSR. I bought a Saleae Logic Pro 16 and PICKit to run my own experiments with the LFSR. Now that we knew how to get into the debug menu, I was able to go full speed on continuing my reverse engineering work.
+Work continued on the Slack. raldi and Trevor Roach decided to look into the behavior of U7 since it was pretty well known by now that it acted as a LFSR. I bought a Saleae Logic Pro 16 and PICKit to run my own experiments with the LFSR. Now that we knew how to get into the debug menu, I was able to go full speed on continuing my reverse engineering work.
 
 wireng posted a hardware AMA on reddit, and I took the opportunity to learn more about the LFSR behavior and the two remaining bugs. One seemed easy enough to fix (a bitflip), the other one not so much - it seemed like a high level architectural change more than anything. What made matters worse was that the architectural change was in the very large, annoyingly obfuscated puzzle check function. It made use of some tricks like using unaligned addresses for branches and jumps (MIPS ignores the least significant bit) which prevented autoanalysis, many overlapping memory reads/writes, and multiple levels of jump tables. I still have not figured out completely how this function works and as such had to wait for the v2 firmware to drop before the O could be solved.
 
@@ -100,7 +100,7 @@ And the rest, they say, is history.
 Thanks to the following people (in no particular order, let me know if I forgot your name)
 
 * negative_alpha and Zwiehunder - brought a ton of useful gear and expertise to DC26, figured out pairing/karma states and U7's LFSR behavior
-* braz and Trevor Roach - figured out how to bruteforce the LFSR in 8 bit mode
+* raldi and Trevor Roach - figured out how to bruteforce the LFSR in 8 bit mode
 * Professor Plum - discovered how to legitimately solve Bobo's head (green O) in v2 firmware, also found the arcade room easter egg when U7 is flipped
 * 0x01Atlas - reverse engineered the badgebus/pairing protocol and also made (one of) the badge emulators
 * repentsinner - setting up the Slack channel where we could share information and coordinate groups to work on the badge
